@@ -1,0 +1,57 @@
+
+---
+  title: "Activity 04: Data Transformation with Tidyverse"
+author: "Navarroza"
+date: "`r Sys.Date()`"
+output: html_document
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+getwd()
+setwd("C:/Users/Admin/downloads")
+#1 
+library(tidyverse)
+habitat <- read_csv("habitat_types.csv")
+#2
+glimpse(habitat)
+#3
+sub <- habitat %>%
+  select(Transect,Htypes,SmallTrees,FloweringTrees,HerbsCover,GroundCover)
+#4
+cvt <- sub %>%
+  filter(Htypes == "CVT") %>%
+  arrange(desc(SmallTrees))
+cvt
+mean <- habitat %>%
+  group_by(Htypes) %>%
+  summarise(MeanFloweringTrees = mean(FloweringTrees, na.rm = TRUE) )
+#5
+cvt
+# Answer:
+# Transects IT2P7 and IT3P0 both have the highest count
+# with 10 small trees each.
+
+#6
+mean <- habitat %>%
+  group_by(Htypes) %>%
+  summarise(MeanFloweringTrees = mean(FloweringTrees, na.rm = TRUE))
+mean
+#7
+subsub <- sub %>%
+  mutate(HerbGroundDiff = HerbsCover - GroundCover)
+subsub
+nodiff <- subsub %>%
+  filter(HerbGroundDiff == 0)
+nodiff
+nodiff |>
+  select(Transect, HerbGroundDiff) |>
+  head(3)
+#Answer
+# IT1P5, IT2P5, It3P1
+#8
+wide <- subsub %>%
+  pivot_wider(
+    names_from = Htypes,
+    values_from = c(SmallTrees, FloweringTrees, HerbGroundDiff))
+wide

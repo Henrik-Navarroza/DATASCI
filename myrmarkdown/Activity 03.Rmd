@@ -1,0 +1,115 @@
+---
+  title: "Activity 03: Summary Statistics, Frequency Distribution, and Graphical Representation"
+author: "Navarroza"
+date: "`r Sys.Date()`"
+output: html_document
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+#1
+getwd()
+setwd("C:/Users/Admin/downloads")
+data1 <- read.csv("herpa.csv", stringsAsFactors = FALSE)
+str(data1)
+good<-complete.cases(data1)
+head(data1[good,])
+cleaned<-data1[good,]
+#2
+y<- cleaned$elevation
+mean(y)
+sd(y)
+range(y)
+#3 typical loop
+x<-cleaned[,7:33]
+x_loop <- numeric(ncol(x))
+
+for(i in 1:ncol(x)) {x_loop[i] <- sum(x[, i], na.rm = TRUE)}
+x_loop
+names(x_loop)<-colnames(x)
+x_loop
+
+#3 compaxt loop
+x_lopp <- colSums(x, na.rm = TRUE)
+x_lopp
+
+#4
+ms<-names(which.max(x_loop))
+mc<-max(x_loop)
+fs<-names(which.min(x_loop))
+fc<-min(x_loop)
+ms
+mc
+fs
+fc
+#5 Habitat Combine
+combined <- data.frame(
+  Htypes = cleaned$Htypes,
+  MostSpecies = cleaned[[ms]],
+  FewestSpecies = cleaned[[fs]])
+combined
+#5 Habitat Mean
+meanmost<-tapply(combined$MostSpecies, combined$Htypes, mean)
+meanmost
+meanfew<-tapply(combined$FewestSpecies, combined$Htypes, mean)
+meanfew
+#5 Habitat Most Count
+totalmost<-tapply(combined$MostSpecies, combined$Htypes,sum)
+totalmost
+totalfew<-tapply(combined$FewestSpecies, combined$Htypes,sum)
+totalfew
+totalspecies <- totalmost + totalfew
+totalspecies
+names(which.max(totalspecies))
+
+#1 Subset and Combine Data
+plot_data <- data.frame(
+  Elevation = cleaned$Elev,
+  SPPTotal = cleaned$SPPTotal,
+  Htypes = as.factor(cleaned$Htypes)
+)
+
+#2  No Species habitat
+habitat_totals <- tapply(plot_data$SPPTotal, plot_data$Htypes, sum, na.rm = TRUE)
+
+print("Total species observed per habitat:")
+habitat_totals
+
+#2 habitats with 0 species
+zero_species_habitats <- names(habitat_totals[habitat_totals == 0])
+print("Habitat types with no species observations:")
+zero_species_habitats
+
+
+#3 Format
+par(mfrow = c(2, 2)) 
+
+# Scatter Plot
+plot(plot_data$Elevation, plot_data$SPPTotal,
+     col = plot_data$Htypes, 
+     pch = 19, # Solid circles
+     xlab = "Elevation (m)", 
+     ylab = "Species Total Count (SPPTotal)",
+     main = "Species Count vs. Elevation by Habitat",)
+legend("topright", legend = levels(plot_data$Htypes), 
+       col = 1:length(levels(plot_data$Htypes)), pch = 19, cex = 0.8)
+
+# Bar Plot
+barplot(habitat_totals,
+        xlab = "Habitat Types",
+        ylab = "Total Species Observed",
+        main = "Total Species per Habitat",
+        col = "blue",
+        las = 2)
+# Histogram
+hist(plot_data$SPPTotal,
+     xlab = "Species Total Count per Site",
+     ylab = "Frequency of Sites",
+     main = "Distribution of Site Species Counts",
+     col = "lightgreen",
+     border = "black")
+par(mfrow = c(1, 1))
+
+
+
+
