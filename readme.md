@@ -1,4 +1,4 @@
-This repository contains files for Life Data Science Laboratory
+This repository contains files for the Life Data Science Laboratory
 
 Activity 3  https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Activity-03.html
 
