@@ -1,0 +1,104 @@
+---
+title: "Navarroza_hclust"
+author: "Henrik Navarroza"
+date: "June 18"
+output: html_document
+---
+
+library(PCAtest)
+library(MASS)
+setwd("C:/Users/Admin/downloads")
+library(cluster)
+#A.
+
+```{r steps}
+# 1. 
+frogs_data <- read.csv("Meneses_et.al_2026_Platymantis.csv")
+
+# 2. 
+frogs_numeric <- frogs_data[, 10:34]
+
+# 3. 
+class(frogs_numeric)
+str(frogs_numeric)
+features<- ncol(frogs_numeric)
+
+# There are 25 morphological features
+
+# 4. 
+sum(is.na(frogs_numeric))
+frogs_numeric <- na.omit(frogs_numeric)
+
+# 5. 
+frogs_scaled <- scale(frogs_numeric)
+cor_mat <- cor(frogs_scaled)
+
+# 6.
+pca_result <- prcomp(frogs_scaled)
+
+# 7. 
+eig_values <- pca_result$sdev^2
+prop_var <- eig_values / sum(eig_values)
+
+# 8. 
+print(prop_var)
+
+barplot(prop_var,
+        names.arg = paste0("PC", 1:length(prop_var)),
+        ylim = c(0, max(prop_var) + 0.1),
+        col = "blue",
+        main = "Scree Plot (Proportion of Variance)",
+        ylab = "Proportion of Variance Explained")
+
+plot(pca_result$x[,1], pca_result$x[,2],
+     xlab = paste0("PC1 (", round(prop_var[1]*100, 1), "%)"),
+     ylab = paste0("PC2 (", round(prop_var[2]*100, 1), "%)"),
+     main = "PCA Biplot",
+     pch = 19,
+     col = as.factor(frogs_data$Species))
+
+legend("topright",
+       legend = levels(as.factor(frogs_data$Species)),
+       col = 1:length(levels(as.factor(frogs_data$Species))),
+       pch = 19)
+
+```
+
+# B.
+
+```{r steps2}
+# 1. Examine the variance explained by principal components using the Broken-stick method and the PCAtest package. What is the difference between these two methods for assessing the importance of principal components?
+
+#The Broken-stick method is a theoretical model that provides a quick, objective benchmark by comparing observed variance to a random distribution of variance. Conversely, the PCAtest approach is an empirical, inferential method that uses permutation-based resampling to calculate p-values, offering a more rigorous statistical validation of component importance at the cost of high computational demand. Ultimately, the Broken-stick method is preferred for standard exploratory dimensionality reduction, while PCAtest is utilized when formal statistical proof of significance is required for peer-reviewed research.
+
+
+# 2
+broken_stick <- function(p){
+  sapply(1:p, function(k){
+    sum(1 / (k:p)) / p
+  })
+}
+
+bs <- broken_stick(ncol(frogs_numeric))
+
+# Plot Observed vs Broken Stick
+plot(prop_var,
+     type = "b",
+     pch = 19,
+     ylim = c(0, max(prop_var)),
+     xlab = "Principal Component",
+     ylab = "Proportion of Variance",
+     main = "Broken-Stick Analysis")
+
+lines(bs,type = "b",pch = 17,col = "red")
+
+legend("topright",
+       legend = c("Observed", "Broken Stick"),
+       pch = c(19, 17),
+       col = c("black", "red"))
+
+
+```
+
+
+
