@@ -7,3 +7,7 @@ Activity 4: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Activity-04.h
 Activity 7: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Activity-07.html
 
 Activity 8: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_hclust.html
+
+Activity 9: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_PCA.html
+
+
