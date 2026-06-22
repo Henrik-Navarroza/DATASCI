@@ -35,7 +35,8 @@ plot(k_range, sil_ward, type = "b", pch = 19, col = "blue",
 lines(k_range, sil_single, type = "b", pch = 19, col = "red")
 legend("topright", legend = c("Ward's", "Single Linkage"), 
        col = c("blue", "red"), lty = 1, pch = 19)
-
+result<-PCAtest(frogs_scaled, 100, 100, 0.05, varcorr=FALSE, counter=FALSE, plot=TRUE)
+print(result)
 
 
 
