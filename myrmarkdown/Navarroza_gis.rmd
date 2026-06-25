@@ -1,0 +1,56 @@
+---
+title: "GIS Mapping of Species Distribution"
+author: "Henrik Navarroza"
+date: "June 25`"
+output: html_document
+---
+
+```{r setup}
+library(dplyr)
+library(sf)
+library(terra)
+library(ggplot2)
+setwd("C:/Users/Admin/downloads")
+# 1. 
+frogs_raw <- read.csv("Frog.csv", sep = "\t")
+frogs_clean <- frogs_raw %>%
+  filter(!is.na(decimalLatitude), !is.na(decimalLongitude)) %>%
+  distinct(occurrenceID, .keep_all = TRUE) %>%
+  select(species, decimalLatitude, decimalLongitude, locality, stateProvince, year)
+
+# 2.
+frogs_sf <- st_as_sf(frogs_clean, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326)
+
+# 3. 
+phl_provinces <- st_read("PHL_adm1.shp")
+phl_provinces <- st_make_valid(phl_provinces)
+relevant_provinces <- phl_provinces[frogs_sf, ]
+
+plot(st_geometry(relevant_provinces), main = "Relevant Provinces for Species Distribution")
+dem <- rast("PHL_msk_alt.tif")
+dem_crop <- crop(dem, relevant_provinces)
+dem_clipped <- mask(dem_crop, relevant_provinces)
+plot(dem_clipped, main = "Clipped Elevation Model for Study Area")
+
+# 4
+frogs_sf <- st_transform(frogs_sf, 4326)
+relevant_provinces <- st_transform(relevant_provinces, 4326)
+dem_df <- as.data.frame(dem_clipped, xy = TRUE)
+colnames(dem_df) <- c("x", "y", "elevation")
+ggplot() +
+  # Layer 1: dem
+  geom_raster(data = dem_df, aes(x = x, y = y, fill = elevation)) +
+  scale_fill_gradientn(colors = terrain.colors(10), name = "Elevation (m)") +
+  
+  # Layer 2: Province
+  geom_sf(data = relevant_provinces, fill = NA, color = "black", linewidth = 0.5) +
+  
+  # Layer 3: Species Points
+  geom_sf(data = frogs_sf, aes(color = species), size = 2, alpha = 0.9) +
+
+  theme_minimal() +
+  labs(title = "Species Geographic Distribution",
+       subtitle = "Overlaid on Provincial Boundaries and Elevation",
+       x = "Longitude", y = "Latitude") +
+  theme(legend.position = "right")
+```
