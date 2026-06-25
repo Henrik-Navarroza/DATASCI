@@ -10,4 +10,6 @@ Activity 8: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_hcl
 
 Activity 9: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_PCA.html
 
+Activity 10: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_gis.html
+
 
