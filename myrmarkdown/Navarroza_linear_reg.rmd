@@ -1,0 +1,101 @@
+---
+title: "Linear Regression Analysis"
+author: "Henrik Navarroza"
+date: "July 6"
+---
+```{r}
+ #A
+library(terra)
+library(tidyverse)
+setwd("C:/Users/Admin/downloads") 
+herpedata <- read.csv("herpa.csv")
+herpeclean <- herpedata[complete.cases(herpedata$SPPTotal), ]
+phil_dem <- rast("PHL_msk_alt.tif")
+herpecoord <- herpeclean[, c("Long", "Lat")]
+coord <- vect(as.matrix(herpecoord), crs = crs(phil_dem))
+coordelev <- terra::extract(phil_dem, coord)
+
+richelev <- data.frame(Richness = herpeclean$SPPTotal, Elevation = coordelev[,2])
+head(richelev)
+x <- richelev$Elevation
+y <- richelev$Richness
+xbar <- mean(x)
+ybar <- mean(y)
+b <- sum((x - xbar) * (y - ybar)) / sum((x - xbar)^2)
+a <- ybar - b * xbar
+
+cat("Regression Equation:\n")
+cat("y=", round(a,3), "+", round(b,3), "x\n")
+
+yhat <- a + b * x
+plot(x, y,
+  pch = 19, col = "green",
+  xlab = "Elevation (m)", ylab = "Species Richness",
+  main = "Simple Linear Regression Model")
+abline(a, b, col = "goldenrod4", lwd = 2)
+points(x, yhat, pch = 17, col = "blue", cex = 1.2)
+segments (x0 = x, y0 = y, x1 = x, y1 = yhat, lty = 2, col = "darkorange")
+legend("topright",
+  legend = c("Observed", "Predicted", "Regression Line"),
+  pch = c(19, 17, NA),
+  lty = c(NA, NA, 1),
+  col = c("green", "blue",  "goldenrod4"),
+  lwd = c(NA, NA, 2),
+  bty = "n")
+
+# Inisghts 
+# The downward-sloping regression line indicates a statistically significant negative relationship between elevation and species richness, suggesting that higher altitudes may impose physiological or environmental constraints on these amphibian and reptile species. The wide spread of observed data points around the regression line suggests that while elevation is a key driver, it does not fully account for all variation in species diversity across your study sites. This variance implies that additional factors, such as local climatic conditions or specific habitat characteristics, are likely required to build a more comprehensive model of species distribution.
+
+```
+
+ 
+
+
+```{r}
+#B
+phil_rain <- rast("annual_precipitation.tif")
+phil_temp <- rast("annual_temperature.tif")
+coordrain <-  terra::extract(phil_rain, coord)
+coordtemp <-  terra::extract(phil_temp, coord)
+
+combined <- data.frame(
+  Richness = herpeclean$SPPTotal,
+  Elevation = coordelev[,2],
+  Precipitation = coordrain[,2],
+  Temperature = coordtemp[,2])
+  
+model <- lm(Richness ~ Elevation + Precipitation + Temperature, data = combined)
+
+x <- combined$Elevation
+x1 <- combined$`Precipitation`
+x2 <- combined$`Temperature`
+y <- combined$Richness
+model <- lm(y ~ x + x1 + x2)
+coef(model)
+
+yhat <- predict(model)
+residuals <- residuals(model)
+results <- data.frame(
+  Elevation = x,
+  "Annual Precipitation" = x1,
+  "Annual Temperature" = x2,
+  Observed = y,
+  Predicted = round(yhat,2),
+  Residual = round(residuals,2)
+)
+print(results)
+
+summary(model)
+
+# Insights
+#The multiple linear regression model indicates that annual precipitation is the only statistically significant environmental predictor of species richness, showing a negative correlation with the observed diversity. While the model as a whole is statistically significant, the low adjusted R-squared of 0.2586 suggests that these environmental variables collectively explain only about 26% of the variation in species richness. This implies that other unmeasured biological or habitat-specific factors are likely more influential in determining the observed distribution of these species.
+```
+
+
+
+  
+
+
+
+
+```
