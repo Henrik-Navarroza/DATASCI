@@ -12,4 +12,5 @@ Activity 9: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_PCA
 
 Activity 10: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_gis.html
 
+Activity 11: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_linear_reg.html
 
