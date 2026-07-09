@@ -14,3 +14,4 @@ Activity 10: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_gi
 
 Activity 11: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_linear_reg.html
 
+Activity 12: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_logistic_reg.html
