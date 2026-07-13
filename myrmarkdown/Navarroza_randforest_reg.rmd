@@ -1,0 +1,77 @@
+
+---
+title: "Random Forest"
+author: "Henrik Navarroza"
+date: "July 13`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r}
+library(ranger)
+library(randomForest)
+setwd("C:/Users/Admin/downloads") 
+```
+
+```{r}
+data <- read.csv("call_data_12October2025.csv")
+clean <- data[complete.cases(data), ]
+clean$File_Name <- NULL
+clean$Species <- as.factor(clean$Species)
+
+grid <- expand.grid(
+  ntrees = c(100, 200, 300, 400, 500),
+  mtry = 3,
+  nodesize = c(1, 2, 3, 4, 5)
+)
+
+res <- data.frame(
+  ntrees = numeric(),
+  mtry = numeric(),
+  nodesize = numeric(),
+  acc = numeric(),
+  oob = numeric()
+)
+```
+
+
+```{r}
+for(i in 1:nrow(grid)){
+  mod <- ranger(
+    Species ~ .,
+    data = clean,
+    num.trees = grid$ntrees[i],
+    mtry = grid$mtry[i],
+    min.node.size = grid$nodesize[i],
+    importance = 'impurity'
+  )
+  
+  pred <- predict(mod, data = clean)$predictions
+  acc <- mean(pred == clean$Species)
+  
+  res <- rbind(res, data.frame(grid[i,], acc = acc, oob = mod$prediction.error))
+}
+
+best <- res[which.min(res$oob), ]
+
+```
+
+```{r}
+set.seed(123)
+final_rf <- randomForest(
+  Species ~ .,          
+  data = clean,
+  ntree = best$ntrees,
+  mtry = best$mtry,
+  importance = TRUE
+)
+
+varImpPlot(final_rf)
+
+library(rpart)
+library(rpart.plot)
+rpart.plot(rpart(Species ~ ., data = clean))
+```
+
