@@ -17,3 +17,5 @@ Activity 11: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_li
 Activity 12: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_logistic_reg.html
 
 Activity 13: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Navarroza_randforest_reg.html
+
+Activity 14: https://Henrik-Navarroza.github.io/DATASCI/myrmarkdown/Cillan-Navarroza_gradient_boost.html
