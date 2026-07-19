@@ -1,0 +1,66 @@
+
+---
+title: "Gradient Boosting Implementation Guide"
+author: "Cilan-Navarroza"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r}
+  
+  # 3. Understanding Gradient Boosting
+  
+  # Gradient Boosting is an ensemble machine learning technique that builds predictive models sequentially. Unlike bagging methods that build trees independently in parallel, gradient boosting trains models one after another, where each new tree specifically attempts to minimize the errors (residuals) made by the previous ensemble. It converts a collection of weak learners—typically shallow decision trees—into a single strong learner by iteratively shifting the focus toward instances where the model previously performed poorly.
+  
+  # In contrast, a Random Forest utilizes the bagging (bootstrap aggregating) approach. In Random Forest, multiple deep, fully grown trees are built independently in parallel using different subsets of the data and features. The final prediction is an average or a majority vote of all trees. While Random Forest reduces variance and is less prone to overfitting, Gradient Boosting focuses on reducing both bias and variance by iteratively refining the prediction, making it generally more accurate but more sensitive to hyperparameter tuning and potential overfitting if not properly regulated.
+  
+  # 4. Implementation Types for Gradient Boosting
+  
+  # Gradient boosting implementations vary significantly based on the task objective and the nature of the target variable. The most common implementation is the Gradient Boosting Regressor, which is designed for continuous target variables, minimizing Mean Squared Error (MSE) by fitting the next tree to the residual differences. Another primary type is the Gradient Boosting Classifier, used for categorical targets, which minimizes the log-loss function to predict probabilities for class membership.
+
+#Continuous (Regression): The goal is to minimize a continuous loss function, such as Mean Squared Error (MSE). The algorithm predicts a continuous value. In each iteration, it fits a decision tree to the residuals (the simple numerical difference between the actual value and the previous prediction).
+
+#Binary (Classification): The goal is to minimize a loss function like Log-Loss. The model predicts the log-odds of the target. The residuals are replaced by pseudo-residuals, which represent the gradient of the loss function with respect to the current prediction. These represent how far the current probability is from the true label (0 or 1).
+
+#Categorical (Classification): When you have more than two categories (multi-class), the algorithm typically uses a "One-vs-Rest" strategy or optimizes a multinomial log-loss, building sets of trees for each class to predict the probability distribution across all categories.
+  
+  # Beyond these basic types, there are optimized implementations such as XGBoost (eXtreme Gradient Boosting), which incorporates regularization terms into the objective function to prevent overfitting and utilizes efficient parallel processing. LightGBM is another variant that uses gradient-based one-side sampling and exclusive feature bundling to speed up training on large datasets. Finally, CatBoost is specifically designed to handle categorical variables automatically by using ordered boosting, which helps in reducing the bias associated with training on categorical data, making it highly robust for datasets with mixed feature types.
+  
+  # 5. Gradient Boosting Implementation (Gradient Boosting Regressor)
+  
+  # For this example, we focus on the Gradient Boosting Regressor approach. The implementation steps involve initializing the model with a constant value (usually the mean of the target variable). For each iteration, we calculate the residuals—the difference between the actual target values and the current predicted values. We then fit a weak decision tree model to these residuals. The new tree’s output, scaled by a learning rate (also known as shrinkage), is added to the previous prediction. This process is repeated for a specified number of iterations until the loss function is minimized. This iterative correction is the core mechanism that allows the model to capture complex, non-linear relationships in the data effectively.
+  
+  # 6. Manual Implementation in R (Without External Packages)
+
+# Generating dummy data
+set.seed(42)
+train <- data.frame(x = rnorm(100), y = rnorm(100) + 2 * rnorm(100))
+
+# 1. Initialize prediction with the mean of the target
+y_pred <- rep(mean(train$y), nrow(train))
+learning_rate <- 0.1
+n_iterations <- 50
+
+# Use the internal 'stats' package regression (lm) as a weak learner 
+# to stay within base R functionality for simplicity.
+for(i in 1:n_iterations) {
+  # 2. Calculate residuals
+  residuals <- train$y - y_pred
+  
+  # 3. Fit a weak learner to residuals using a linear model
+  # A linear model acts as a simple base learner
+  model <- lm(residuals ~ x, data = train)
+  
+  # 4. Update the prediction
+  y_pred <- y_pred + (learning_rate * predict(model, train))
+}
+
+# The final y_pred contains the boosted predictions.
+plot(train$x, train$y, main="Boosted Regression Result")
+points(train$x, y_pred, col="red")
+```  
+
+
+
+
+
+
