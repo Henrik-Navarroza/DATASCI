@@ -1,6 +1,6 @@
 ---
 title: "Activity 08: Hiearchal Clustering"
-author: "Navarroza"
+author: "Henrik Navarroza"
 date: "June 11"
 output: html_document
 ---
